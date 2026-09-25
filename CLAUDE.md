@@ -21,6 +21,13 @@ Nothing is built yet beyond this scaffold. Update this file as the phases land.
 - Node.js 26 and npm 11 are on PATH (Bun 1.3 is also installed but is not used). Node 26 runs `.ts`
   files directly via built-in type stripping, so there is no build step in development.
 - Shell: PowerShell is primary; a Git Bash is also available.
+- **Smart App Control is ON** (`HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy`,
+  `VerifiedAndReputablePolicyState = 1`). It blocks unsigned binaries with "An Application Control
+  policy has blocked this file" (WinError 4551) and the process exits with `0xC0E90002` before
+  printing anything. The llama.cpp release zips are unsigned and are blocked by this (verified
+  2026-09-25 with b11149: `llama-server-impl.dll`, `llama-common.dll`, `mtmd.dll`). Any inference
+  engine used here must therefore be code-signed, or the owner must turn Smart App Control off
+  (a one-way switch in Windows Security). Bitdefender is also installed.
 
 ## Language: pure TypeScript
 
