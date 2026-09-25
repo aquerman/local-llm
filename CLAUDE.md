@@ -27,7 +27,8 @@ Nothing is built yet beyond this scaffold. Update this file as the phases land.
   printing anything. The llama.cpp release zips are unsigned and are blocked by this (verified
   2026-09-25 with b11149: `llama-server-impl.dll`, `llama-common.dll`, `mtmd.dll`). Any inference
   engine used here must therefore be code-signed, or the owner must turn Smart App Control off
-  (a one-way switch in Windows Security). Bitdefender is also installed.
+  (a one-way switch in Windows Security). **The owner turned it off on 2026-09-25**; the value now
+  reads 0 and llama.cpp runs. Bitdefender is also installed.
 
 ## Language: pure TypeScript
 
@@ -88,7 +89,15 @@ Node 24.12 / 25.2). Consequences that follow from the Node docs:
 - `llama-<tag>-bin-win-cuda-13.4-x64.zip` – the executables
 - `cudart-llama-bin-win-cuda-13.4-x64.zip` – CUDA runtime DLLs, must sit next to the exes
 
-`bin/` is git-ignored. Models are fetched by `llama-server -hf <repo>:<quant>` into the llama.cpp
-cache on first start; nothing model-related lives in the repo.
+`bin/` is git-ignored (installed: b11149, CUDA 13.4). Models are fetched by
+`llama-server -hf <repo>:<quant>` on first start into `~/.cache/huggingface/hub/models--<org>--<repo>/`
+(not `%LOCALAPPDATA%\llama.cpp`); nothing model-related lives in the repo.
 
-Validated models: none yet.
+When launching `start-server.ps1` from Windows PowerShell 5.1 with output redirected, every stderr
+line is wrapped in a `NativeCommandError` record. That is PS 5.1 noise, not a server error.
+
+### Validated models
+
+| Model (GGUF) | Quant | VRAM at 16k ctx, q8 KV | Speed on RTX 3060 | Notes |
+|---|---|---|---|---|
+| `bartowski/Qwen2.5-7B-Instruct-GGUF` | Q4_K_M (4.7 GB) | ~6.7 GB | ~32 tok/s gen, ~550 tok/s prompt | Phase 1 chat OK. Native tool-calling support per llama.cpp docs; untested yet. |

@@ -40,15 +40,24 @@ async function ask(userText: string): Promise<void> {
 }
 
 const rl = createInterface({ input: stdin, output: stdout });
-// When stdin closes (Ctrl+C / Ctrl+D / piped input ends) a pending question()
-// never settles, so exit explicitly instead of leaving a dangling top-level await.
-rl.on("close", () => process.exit(0));
-console.log(`Connected to ${config.baseURL} (model: ${config.model}). Ctrl+C to quit.\n`);
+console.log(`Connected to ${config.baseURL} (model: ${config.model}). Ctrl+C to quit.
+`);
 
-// Loop until EOF (Ctrl+C / Ctrl+D).
-for (;;) {
-  const line = await rl.question("you> ");
-  if (line.trim() === "") continue;
-  stdout.write("llm> ");
-  await ask(line);
+// readline is an async iterable of lines. Iterating it (instead of calling
+// rl.question() in a loop) means lines that arrive while we are awaiting a
+// reply are queued rather than lost, and the loop ends cleanly when stdin
+// closes (Ctrl+D, or the end of piped input) after the last reply finishes.
+// Once stdin has closed, prompt() throws ERR_USE_AFTER_CLOSE, but the iterator
+// may still hand us lines that were buffered before the close. Track it.
+let inputClosed = false;
+rl.once("close", () => { inputClosed = true; });
+
+rl.setPrompt("you> ");
+rl.prompt();
+for await (const line of rl) {
+  if (line.trim() !== "") {
+    stdout.write("llm> ");
+    await ask(line);
+  }
+  if (!inputClosed) rl.prompt();
 }

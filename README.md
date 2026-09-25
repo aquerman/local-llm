@@ -21,4 +21,5 @@ reaching parity with hosted chat assistants and then using it for agentic coding
 
 ## Status
 
-Just started. See `CLAUDE.md` for the architecture decisions and conventions.
+Phase 1 works: `npm run chat` streams replies from Qwen2.5-7B-Instruct served by llama-server on
+the GPU. See `CLAUDE.md` for setup, architecture decisions and conventions.
