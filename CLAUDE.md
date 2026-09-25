@@ -57,4 +57,31 @@ Model weights (`models/`, `*.gguf`, `*.safetensors`) are git-ignored and must ne
 
 ## Commands
 
-None yet. Add build/run/test commands here as they are created.
+```bash
+npm install            # deps: openai (runtime), typescript + @types/node (dev)
+npm run typecheck      # tsc with noEmit; Node itself never type-checks
+npm run chat           # phase 1 streaming chat REPL (needs llama-server running)
+.\scripts\start-server.ps1 [-Model <hf-repo:quant | path.gguf>] [-Ctx 16384] [-Port 8080]
+```
+
+There is no build step: `node src/chat.ts` runs the source directly (type stripping, stable since
+Node 24.12 / 25.2). Consequences that follow from the Node docs:
+
+- `tsconfig.json` is only for `tsc`. Node ignores it, so no `paths` aliases; use `#`-prefixed
+  subpath imports if aliasing is ever needed.
+- No `enum`, no `namespace` with runtime code, no parameter properties, no decorators.
+  `erasableSyntaxOnly` makes `tsc` reject these.
+- Type-only imports must use `import type` (`verbatimModuleSyntax` enforces this).
+
+## llama.cpp install (one-time, not in git)
+
+`winget install llama.cpp` ships the **Vulkan** build. For CUDA, download from the GitHub release
+(`gh release download <tag> --repo ggml-org/llama.cpp -p ...`) both zips and unpack them into `bin/`:
+
+- `llama-<tag>-bin-win-cuda-13.4-x64.zip` – the executables
+- `cudart-llama-bin-win-cuda-13.4-x64.zip` – CUDA runtime DLLs, must sit next to the exes
+
+`bin/` is git-ignored. Models are fetched by `llama-server -hf <repo>:<quant>` into the llama.cpp
+cache on first start; nothing model-related lives in the repo.
+
+Validated models: none yet.

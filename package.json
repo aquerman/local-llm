@@ -1,0 +1,22 @@
+{
+  "name": "local-llm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted LLM on a single consumer GPU: chat, tools, then agentic coding",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "chat": "node src/chat.ts",
+    "typecheck": "tsc"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^7.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}

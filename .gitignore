@@ -20,3 +20,4 @@ models/
 .idea/
 .DS_Store
 Thumbs.db
+bin/
