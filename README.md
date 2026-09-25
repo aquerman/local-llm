@@ -9,6 +9,11 @@ reaching parity with hosted chat assistants and then using it for agentic coding
 2. **Tools** – add tool/function calling (web search, file access, code execution, etc.) on top of the chat loop.
 3. **Agentic coding** – use the local model as the backend for a coding agent.
 
+## Stack
+
+- Client, tools and agent: TypeScript on Node.js 26
+- Inference engine: llama.cpp `llama-server`, reached over its OpenAI-compatible HTTP API
+
 ## Hardware
 
 - NVIDIA GeForce RTX 3060, 12 GB VRAM

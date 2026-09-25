@@ -1,11 +1,8 @@
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-*.egg-info/
+# Node
+node_modules/
 dist/
-build/
+*.tsbuildinfo
+npm-debug.log*
 
 # Model weights and caches (never commit these)
 models/

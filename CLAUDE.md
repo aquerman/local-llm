@@ -18,15 +18,26 @@ Nothing is built yet beyond this scaffold. Update this file as the phases land.
   must fit in ~11 GB after CUDA overhead.
 - OS: Windows 11, native. **No WSL2 and no Docker are installed.** Anything that only ships Linux builds
   (notably vLLM) cannot run here without first installing WSL2.
-- Python 3.14 is on PATH. Prefer `uv` for environments once it is installed; the standard-library
-  `venv` is the fallback.
+- Node.js 26 and npm 11 are on PATH (Bun 1.3 is also installed but is not used). Node 26 runs `.ts`
+  files directly via built-in type stripping, so there is no build step in development.
 - Shell: PowerShell is primary; a Git Bash is also available.
+
+## Language: pure TypeScript
+
+All code in this repo is TypeScript, running on Node.js. This is a deliberate choice: the owner is
+learning TypeScript through this project. Prefer explaining *why* a TypeScript construct is used
+over just writing it, and prefer idiomatic, strict, well-typed code over clever shortcuts.
+
+- Strict mode on (`"strict": true` in `tsconfig.json`), ESM modules (`"type": "module"`).
+- Use `.ts` extensions in relative imports so Node can run the source directly.
+- The inference engine is C++ (llama.cpp) and is never linked or wrapped in-process. It is only
+  ever reached over HTTP.
 
 ## Architecture decision: backend-agnostic, OpenAI-compatible
 
 The inference engine is treated as a swappable component. All application code (chat CLI, tool
-runner, agent) talks **only** to an OpenAI-compatible `/v1/chat/completions` endpoint and never
-imports an engine's Python package directly. This keeps the door open to move from a native Windows
+runner, agent) talks **only** to an OpenAI-compatible `/v1/chat/completions` endpoint, using the
+official `openai` npm package pointed at the local base URL. This keeps the door open to move from a native Windows
 engine (llama.cpp / Ollama) to vLLM under WSL2 later without touching the client side.
 
 Engine order of preference for this hardware:
