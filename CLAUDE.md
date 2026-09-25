@@ -93,6 +93,9 @@ Node 24.12 / 25.2). Consequences that follow from the Node docs:
 `llama-server -hf <repo>:<quant>` on first start into `~/.cache/huggingface/hub/models--<org>--<repo>/`
 (not `%LOCALAPPDATA%\llama.cpp`); nothing model-related lives in the repo.
 
+Running `.ps1` files needs `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once (the Windows
+default is Restricted). One-off alternative: `powershell -ExecutionPolicy Bypass -File <script>`.
+
 When launching `start-server.ps1` from Windows PowerShell 5.1 with output redirected, every stderr
 line is wrapped in a `NativeCommandError` record. That is PS 5.1 noise, not a server error.
 
