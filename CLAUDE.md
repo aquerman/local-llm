@@ -73,8 +73,8 @@ npm install            # deps: openai (runtime), typescript + @types/node (dev)
 npm run typecheck      # tsc with noEmit; Node itself never type-checks
 npm run chat           # phase 1 streaming chat REPL (needs llama-server running)
 .\scripts\start-server.ps1 [-Model <hf-repo:quant | path.gguf>] [-Ctx 16384] [-Port 8080]
-scripts\start-server.bat  # double-click launcher for the line above; a copy sits on the Desktop
-# ..\local-agent-chat\scripts\start-all.bat starts this server and LibreChat together (Desktop: "Start All.bat")
+scripts\start-server.bat  # double-click launcher for the line above; Desktop "Start Server" is a shortcut to it
+# ..\local-agent-chat\scripts\start-all.bat starts this server and LibreChat together (Desktop shortcut "Start All")
 ```
 
 There is no build step: `node src/chat.ts` runs the source directly (type stripping, stable since
