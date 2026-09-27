@@ -60,6 +60,9 @@ Model weights (`models/`, `*.gguf`, `*.safetensors`) are git-ignored and must ne
 
 - Keep engine-specific launch flags in scripts under `scripts/`, not in application code.
 - Keep the server base URL and model name in configuration (env vars / `.env`), not hard-coded.
+- Tasks live on the dotpm board named in `.claude/dotpm.json`. The global `/pickup` skill takes a task
+  from its "Claude" column, works it on a `task/<slug>` branch and moves it to "In Review"; only the
+  owner sets "Done".
 - Any new phase gets a short section in this file: how to start the server, how to run the client,
   which model was validated and at which quant.
 
@@ -70,6 +73,8 @@ npm install            # deps: openai (runtime), typescript + @types/node (dev)
 npm run typecheck      # tsc with noEmit; Node itself never type-checks
 npm run chat           # phase 1 streaming chat REPL (needs llama-server running)
 .\scripts\start-server.ps1 [-Model <hf-repo:quant | path.gguf>] [-Ctx 16384] [-Port 8080]
+scripts\start-server.bat  # double-click launcher for the line above; a copy sits on the Desktop
+# ..\local-agent-chat\scripts\start-all.bat starts this server and LibreChat together (Desktop: "Start All.bat")
 ```
 
 There is no build step: `node src/chat.ts` runs the source directly (type stripping, stable since
@@ -104,3 +109,19 @@ line is wrapped in a `NativeCommandError` record. That is PS 5.1 noise, not a se
 | Model (GGUF) | Quant | VRAM at 16k ctx, q8 KV | Speed on RTX 3060 | Notes |
 |---|---|---|---|---|
 | `bartowski/Qwen2.5-7B-Instruct-GGUF` | Q4_K_M (4.7 GB) | ~6.7 GB | ~32 tok/s gen, ~550 tok/s prompt | Phase 1 chat OK. Native tool-calling support per llama.cpp docs; untested yet. |
+
+## Phone access (Tailscale)
+
+llama-server stays bound to `127.0.0.1`; Tailscale proxies it to the tailnet only (set up 2026-09-26,
+persists across reboots):
+
+```bash
+tailscale serve --bg --http 80 http://127.0.0.1:8080   # already configured; check: tailscale serve status
+tailscale serve --http=80 off                          # undo
+```
+
+On the phone (iPhone, on Tailscale) open `http://aquerman-desktop.taild4e78b.ts.net/` in Safari: that is
+llama-server's built-in web UI. Share → Add to Home Screen. The UI ships a `manifest.webmanifest`.
+Plain HTTP is not a "secure context", so browser features like clipboard copy may not work; enabling
+HTTPS certificates for the tailnet (admin console → DNS → HTTPS) and switching to
+`tailscale serve --bg 8080` gives `https://aquerman-desktop.taild4e78b.ts.net/` instead.
