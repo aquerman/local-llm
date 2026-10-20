@@ -21,14 +21,12 @@ Nothing is built yet beyond this scaffold. Update this file as the phases land.
 - Node.js 26 and npm 11 are on PATH (Bun 1.3 is also installed but is not used). Node 26 runs `.ts`
   files directly via built-in type stripping, so there is no build step in development.
 - Shell: PowerShell is primary; a Git Bash is also available.
-- **Smart App Control is ON** (`HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy`,
-  `VerifiedAndReputablePolicyState = 1`). It blocks unsigned binaries with "An Application Control
-  policy has blocked this file" (WinError 4551) and the process exits with `0xC0E90002` before
-  printing anything. The llama.cpp release zips are unsigned and are blocked by this (verified
-  2026-09-25 with b11149: `llama-server-impl.dll`, `llama-common.dll`, `mtmd.dll`). Any inference
-  engine used here must therefore be code-signed, or the owner must turn Smart App Control off
-  (a one-way switch in Windows Security). **The owner turned it off on 2026-09-25**; the value now
-  reads 0 and llama.cpp runs. Bitdefender is also installed.
+- **Smart App Control must be off.** When it is on, it blocks unsigned binaries with "An Application
+  Control policy has blocked this file" (WinError 4551) and the process exits with `0xC0E90002` before
+  printing anything. The llama.cpp release zips are unsigned and are blocked by it (`llama-server-impl.dll`,
+  `llama-common.dll`, `mtmd.dll`). Any inference engine used here must therefore be code-signed, or
+  Smart App Control must be turned off (a one-way switch in Windows Security). Check with
+  `HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy`, `VerifiedAndReputablePolicyState` (0 = off).
 
 ## Language: pure TypeScript
 
@@ -120,8 +118,8 @@ tailscale serve --bg --http 80 http://127.0.0.1:8080   # already configured; che
 tailscale serve --http=80 off                          # undo
 ```
 
-On the phone (iPhone, on Tailscale) open `http://aquerman-desktop.taild4e78b.ts.net/` in Safari: that is
+On the phone (on Tailscale) open `http://<machine>.<tailnet>.ts.net/` in Safari: that is
 llama-server's built-in web UI. Share → Add to Home Screen. The UI ships a `manifest.webmanifest`.
 Plain HTTP is not a "secure context", so browser features like clipboard copy may not work; enabling
 HTTPS certificates for the tailnet (admin console → DNS → HTTPS) and switching to
-`tailscale serve --bg 8080` gives `https://aquerman-desktop.taild4e78b.ts.net/` instead.
+`tailscale serve --bg 8080` gives `https://<machine>.<tailnet>.ts.net/` instead.
