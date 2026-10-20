@@ -10,6 +10,6 @@ export interface LlmConfig {
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): LlmConfig {
   return {
     baseURL: env.LLM_BASE_URL ?? "http://127.0.0.1:8080/v1",
-    model: env.LLM_MODEL ?? "local",
+    model: env.LLM_MODEL ?? "Benner",
   };
 }

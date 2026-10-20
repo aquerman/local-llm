@@ -108,7 +108,8 @@ line is wrapped in a `NativeCommandError` record. That is PS 5.1 noise, not a se
 
 | Model (GGUF) | Quant | VRAM at 16k ctx, q8 KV | Speed on RTX 3060 | Notes |
 |---|---|---|---|---|
-| `bartowski/Qwen2.5-7B-Instruct-GGUF` | Q4_K_M (4.7 GB) | ~6.7 GB | ~32 tok/s gen, ~550 tok/s prompt | Phase 1 chat OK. Native tool-calling support per llama.cpp docs; untested yet. |
+| `bartowski/Qwen2.5-7B-Instruct-GGUF` | Q4_K_M (4.7 GB) | ~6.7 GB | ~32 tok/s gen, ~550 tok/s prompt | Phase 1 chat OK. Tool calling verified 2026-10-01 via LibreChat's `websearch` MCP tools (`--jinja`): calls `search` with a sensible query and answers from the results; did not chain to `fetch` unprompted. |
+| `unsloth/Qwen3.5-9B-GGUF` | UD-Q4_K_XL (6.0 GB) | not measured (est. ~7-8 GB) | not measured | **Default in `start-server.ps1` since 2026-10-14**; served as "Benner (Qwen3.5-9B)". Hybrid thinking model: reasons before answering by default, which slows replies. Per-request thinking controls (b11149): `chat_template_kwargs.enable_thinking` and `thinking_budget_tokens` work; `reasoning_effort` and `reasoning_budget` are ignored. Uncapped, it can think past `max_tokens` and return no answer. Picked from `research_notes/model-candidates-2026-10.md`. |
 
 ## Phone access (Tailscale)
 
