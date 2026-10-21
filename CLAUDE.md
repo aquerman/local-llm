@@ -73,6 +73,7 @@ npm run chat           # phase 1 streaming chat REPL (needs llama-server running
 .\scripts\start-server.ps1 [-Model <hf-repo:quant | path.gguf>] [-Ctx 16384] [-Port 8080]
 scripts\start-server.bat  # double-click launcher for the line above; Desktop "Start Server" is a shortcut to it
 # ..\local-agent-chat\scripts\start-all.bat starts this server and LibreChat together (Desktop shortcut "Start All")
+.\scripts\start-embeddings.ps1 [-Model <hf-repo:quant | path.gguf>] [-Port 8081] [-Ngl all]  # embeddings server for RAG
 ```
 
 There is no build step: `node src/chat.ts` runs the source directly (type stripping, stable since
@@ -108,6 +109,24 @@ line is wrapped in a `NativeCommandError` record. That is PS 5.1 noise, not a se
 |---|---|---|---|---|
 | `bartowski/Qwen2.5-7B-Instruct-GGUF` | Q4_K_M (4.7 GB) | ~6.7 GB | ~32 tok/s gen, ~550 tok/s prompt | Phase 1 chat OK. Tool calling verified 2026-10-01 via LibreChat's `websearch` MCP tools (`--jinja`): calls `search` with a sensible query and answers from the results; did not chain to `fetch` unprompted. |
 | `unsloth/Qwen3.5-9B-GGUF` | UD-Q4_K_XL (6.0 GB) | not measured (est. ~7-8 GB) | not measured | **Default in `start-server.ps1` since 2026-10-14**; served as "Benner (Qwen3.5-9B)". Hybrid thinking model: reasons before answering by default, which slows replies. Per-request thinking controls (b11149): `chat_template_kwargs.enable_thinking` and `thinking_budget_tokens` work; `reasoning_effort` and `reasoning_budget` are ignored. Uncapped, it can think past `max_tokens` and return no answer. Picked from `research_notes/model-candidates-2026-10.md`. |
+
+## Embeddings server (for RAG in local-agent-chat)
+
+`scripts\start-embeddings.ps1 [-Model <repo:quant | path.gguf>] [-Port 8081] [-Ngl all]` starts a
+second `llama-server` with `--embedding --pooling mean` on `127.0.0.1:8081` (alias `embed`), next to
+the chat server. It answers `POST /v1/embeddings` for local-agent-chat's RAG API, which turns uploaded
+files into vectors and retrieves the relevant chunks instead of putting a whole file in the prompt.
+
+- Default model `nomic-ai/nomic-embed-text-v1.5-GGUF:Q8_0` (~150 MB, 768 dims, 2048-token inputs),
+  fetched by `-hf` on first start like the chat model. On the GPU it costs ~0.3 GB of VRAM; `-Ngl 0`
+  keeps it on the CPU when the chat model needs every byte. A multilingual alternative of the same
+  class is bge-m3 (~0.6 GB at Q8_0, 1024 dims); switching models means re-uploading files, because
+  stored vectors keep the old size.
+- `..\local-agent-chat\scripts\start-all.bat` opens it as an "Embeddings" tab when that repo's
+  `.env` sets `EMBEDDINGS_PORT`, and skips it when the port already listens.
+- Verified 2026-10-20 in a Linux rig (CPU build, same flags, F16 file of the same model): the RAG
+  API embedded a 22 KB text file through it and retrieval found the one relevant chunk. Not yet run
+  on the RTX 3060.
 
 ## Phone access (Tailscale)
 
